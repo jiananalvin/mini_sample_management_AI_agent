@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'frontend/**'
   workflow_dispatch:
 
 permissions:
@@ -49,6 +47,15 @@ jobs:
             apiUrl: '$API_URL'
           };" > src/environments/environment.prod.ts
           npm run build -- --configuration=production --base-href=/mini_sample_management_AI_agent/
+
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la frontend/ui/dist/ui/browser/ || echo "Build output not found!"
+          if [ ! -d "frontend/ui/dist/ui/browser" ]; then
+            echo "ERROR: Build output directory not found!"
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

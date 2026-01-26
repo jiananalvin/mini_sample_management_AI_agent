@@ -1,0 +1,114 @@
+<div style="max-width: 1000px; margin: 24px auto; font-family: Arial, sans-serif;">
+  <h2>Samples</h2>
+
+  <div *ngIf="error" style="padding: 10px; background: #ffecec; border: 1px solid #ffb3b3; margin-bottom: 12px;">
+    {{ error }}
+  </div>
+
+  <fieldset style="padding: 12px; margin-bottom: 16px;">
+    <legend>Filter</legend>
+    <form [formGroup]="filterForm" (ngSubmit)="refresh()" style="display:flex; gap:12px; align-items:flex-end;">
+      <div>
+        <label>Type</label><br />
+        <input formControlName="type" />
+      </div>
+
+      <div>
+        <label>Status</label><br />
+        <select formControlName="status">
+          <option value="">(any)</option>
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <button type="submit">Apply</button>
+      <button type="button" (click)="filterForm.reset(); refresh();">Reset</button>
+    </form>
+  </fieldset>
+
+  <fieldset style="padding: 12px; margin-bottom: 16px;">
+    <legend>Create sample</legend>
+    <form [formGroup]="createForm" (ngSubmit)="create()" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div>
+        <label>Sample Code</label><br />
+        <input formControlName="sampleCode" placeholder="S-0001" />
+      </div>
+      <div>
+        <label>Type</label><br />
+        <input formControlName="type" placeholder="Blood" />
+      </div>
+      <div>
+        <label>Collected At (ISO)</label><br />
+        <input formControlName="collectedAt" placeholder="2026-01-11T10:00:00Z" />
+      </div>
+      <div>
+        <label>Comment</label><br />
+        <input formControlName="comment" />
+      </div>
+
+      <div style="grid-column: 1 / -1;">
+        <button type="submit" [disabled]="createForm.invalid">Create</button>
+      </div>
+    </form>
+  </fieldset>
+
+  <div *ngIf="loading">Loading...</div>
+
+  <table *ngIf="!loading" border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Sample Code</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Collected At</th>
+        <th>Comment</th>
+        <th style="width: 180px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of samples">
+        <td>{{ s.sampleCode }}</td>
+        <td>{{ s.type }}</td>
+        <td>{{ s.status }}</td>
+        <td>{{ s.collectedAt }}</td>
+        <td>{{ s.comment }}</td>
+        <td>
+          <button (click)="startEdit(s)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <fieldset *ngIf="editId != null" style="padding: 12px; margin-top: 16px;">
+    <legend>Edit sample #{{ editId }}</legend>
+
+    <form [formGroup]="editForm" (ngSubmit)="saveEdit()" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div>
+        <label>Type</label><br />
+        <input formControlName="type" />
+      </div>
+
+      <div>
+        <label>Status</label><br />
+        <select formControlName="status">
+          <option *ngFor="let st of statuses" [value]="st">{{ st }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Collected At (ISO)</label><br />
+        <input formControlName="collectedAt" />
+      </div>
+
+      <div>
+        <label>Comment</label><br />
+        <input formControlName="comment" />
+      </div>
+
+      <div style="grid-column: 1 / -1; display:flex; gap:10px;">
+        <button type="submit" [disabled]="editForm.invalid">Save</button>
+        <button type="button" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </fieldset>
+</div>

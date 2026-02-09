@@ -132,7 +132,25 @@ export class SamplesComponent implements OnInit {
         this.refresh();
       },
       error: (err) => {
-        this.error = err?.error?.message || 'Failed to create sample from natural language';
+        // Try to extract error message from different possible response formats
+        let errorMessage = 'Failed to create sample from natural language';
+        
+        if (err?.error) {
+          if (err.error.message) {
+            errorMessage = err.error.message;
+          } else if (typeof err.error === 'string') {
+            errorMessage = err.error;
+          } else if (err.error.error) {
+            errorMessage = err.error.error;
+          }
+        } else if (err?.message) {
+          errorMessage = err.message;
+        }
+        
+        // Log full error for debugging
+        console.error('Natural language creation error:', err);
+        
+        this.error = errorMessage;
         this.processingNL = false;
       },
     });

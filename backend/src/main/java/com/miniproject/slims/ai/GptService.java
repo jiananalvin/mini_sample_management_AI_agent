@@ -38,7 +38,7 @@ public class GptService {
 
     public SampleExtractionResult extractSampleInfo(String naturalLanguageText) {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("OpenAI API key is not configured. Please set 'openai.api.key' in application.properties");
+            throw new IllegalStateException("OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable in your deployment platform (Railway/Render/etc.) or in application.properties for local development.");
         }
 
         String prompt = buildPrompt(naturalLanguageText);

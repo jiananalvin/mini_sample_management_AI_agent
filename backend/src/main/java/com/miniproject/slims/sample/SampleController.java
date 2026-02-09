@@ -49,18 +49,26 @@ public class SampleController {
 
     @PostMapping("/create-from-natural-language")
     public SampleResponse createFromNaturalLanguage(@Valid @RequestBody NaturalLanguageRequest req) {
-        // Use GPT to extract sample information from natural language
-        GptService.SampleExtractionResult extracted = gptService.extractSampleInfo(req.text());
-        
-        // Create sample using extracted information
-        SampleCreateRequest createRequest = new SampleCreateRequest(
-                extracted.sampleCode(),
-                extracted.type(),
-                extracted.collectedAt(),
-                extracted.comment()
-        );
-        
-        return service.create(createRequest);
+        try {
+            // Use GPT to extract sample information from natural language
+            GptService.SampleExtractionResult extracted = gptService.extractSampleInfo(req.text());
+            
+            // Create sample using extracted information
+            SampleCreateRequest createRequest = new SampleCreateRequest(
+                    extracted.sampleCode(),
+                    extracted.type(),
+                    extracted.collectedAt(),
+                    extracted.comment()
+            );
+            
+            return service.create(createRequest);
+        } catch (IllegalStateException e) {
+            // Re-throw to be handled by GlobalExceptionHandler
+            throw e;
+        } catch (RuntimeException e) {
+            // Re-throw to be handled by GlobalExceptionHandler
+            throw e;
+        }
     }
 
     // Right now this is a PUT endpoint, so it expects a full replacement. 

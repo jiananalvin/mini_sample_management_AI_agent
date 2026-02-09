@@ -39,7 +39,7 @@ jobs:
       - name: Build Angular app
         working-directory: frontend/ui
         env:
-          API_URL: ${{ secrets.API_URL || 'https://your-backend-url.railway.app/api' }}
+          API_URL: ${{ secrets.API_URL || 'https://minisamplemanagementaiagent-production.up.railway.app/api' }}
         run: |
           # Create environment file with API URL
           echo "export const environment = {

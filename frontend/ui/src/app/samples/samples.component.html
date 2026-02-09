@@ -27,7 +27,21 @@
   </fieldset>
 
   <fieldset style="padding: 12px; margin-bottom: 16px;">
-    <legend>Create sample</legend>
+    <legend>Create sample with natural language</legend>
+    <form [formGroup]="naturalLanguageForm" (ngSubmit)="createFromNaturalLanguage()" style="display:flex; gap:12px; align-items:flex-end;">
+      <div style="flex: 1;">
+        <label>Natural Language Input</label><br />
+        <input formControlName="text" placeholder="e.g., create a blood sample ID S-0001 and the time" style="width: 100%;" />
+        <small style="color: #666;">Example: "create a blood sample ID S-0001 and the time"</small>
+      </div>
+      <div>
+        <button type="submit" [disabled]="naturalLanguageForm.invalid || processingNL">Create</button>
+      </div>
+    </form>
+  </fieldset>
+
+  <fieldset style="padding: 12px; margin-bottom: 16px;">
+    <legend>Create sample (manual)</legend>
     <form [formGroup]="createForm" (ngSubmit)="create()" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
       <div>
         <label>Sample Code</label><br />

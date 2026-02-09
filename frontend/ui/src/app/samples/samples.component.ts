@@ -21,8 +21,10 @@ export class SamplesComponent implements OnInit {
   filterForm!: FormGroup;
   createForm!: FormGroup;
   editForm!: FormGroup;
+  naturalLanguageForm!: FormGroup;
 
   editId: number | null = null;
+  processingNL = false;
 
   constructor(private fb: FormBuilder, private api: SampleService) {}
 
@@ -44,6 +46,10 @@ export class SamplesComponent implements OnInit {
       status: ['REGISTERED' as SampleStatus, [Validators.required]],
       collectedAt: ['', [Validators.required]],
       comment: [''],
+    });
+
+    this.naturalLanguageForm = this.fb.group({
+      text: ['', [Validators.required]],
     });
 
     this.refresh();
@@ -107,6 +113,27 @@ export class SamplesComponent implements OnInit {
       },
       error: (err) => {
         this.error = err?.error?.message || 'Update failed';
+      },
+    });
+  }
+
+  createFromNaturalLanguage(): void {
+    if (this.naturalLanguageForm.invalid) return;
+
+    this.processingNL = true;
+    this.error = null;
+
+    const text = this.naturalLanguageForm.get('text')?.value;
+
+    this.api.createFromNaturalLanguage(text).subscribe({
+      next: () => {
+        this.naturalLanguageForm.reset();
+        this.processingNL = false;
+        this.refresh();
+      },
+      error: (err) => {
+        this.error = err?.error?.message || 'Failed to create sample from natural language';
+        this.processingNL = false;
       },
     });
   }

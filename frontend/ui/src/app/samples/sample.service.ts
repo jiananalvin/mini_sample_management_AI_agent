@@ -36,4 +36,8 @@ export class SampleService {
   update(id: number, req: SampleUpdateRequest): Observable<Sample> {
     return this.http.put<Sample>(`${this.baseUrl}/${id}`, req);
   }
+
+  createFromNaturalLanguage(text: string): Observable<Sample> {
+    return this.http.post<Sample>(`${this.baseUrl}/create-from-natural-language`, { text });
+  }
 }

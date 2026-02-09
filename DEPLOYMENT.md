@@ -47,7 +47,17 @@ Replace `YOUR_USERNAME` with your GitHub username.
 
 **Note:** The GitHub Actions workflow will automatically deploy to GitHub Pages when you push changes.
 
-## Step 5: Deploy Backend
+## Step 5: Get OpenAI API Key
+
+Before deploying, you'll need an OpenAI API key for the natural language feature:
+
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Sign up or log in
+3. Click **Create new secret key**
+4. Copy the key (you won't be able to see it again!)
+5. **Important**: Never commit this key to Git or share it publicly
+
+## Step 6: Deploy Backend
 
 You have several options for deploying the Spring Boot backend:
 
@@ -59,8 +69,9 @@ You have several options for deploying the Spring Boot backend:
 4. Select your repository
 5. Railway will auto-detect it's a Java project
 6. Set the root directory to `backend`
-7. Add environment variable:
+7. Add environment variables:
    - `CORS_ALLOWED_ORIGINS`: `https://YOUR_USERNAME.github.io`
+   - `OPENAI_API_KEY`: `your-openai-api-key-here` (Get from https://platform.openai.com/api-keys)
 8. Railway will provide a URL like: `https://your-app.railway.app`
 9. Update the GitHub Actions workflow secret `API_URL` with this URL
 
@@ -76,8 +87,9 @@ You have several options for deploying the Spring Boot backend:
    - **Build Command**: `./mvnw clean package -DskipTests`
    - **Start Command**: `java -jar target/backend-0.0.1-SNAPSHOT.jar`
    - **Environment**: `Java`
-6. Add environment variable:
+6. Add environment variables:
    - `CORS_ALLOWED_ORIGINS`: `https://YOUR_USERNAME.github.io`
+   - `OPENAI_API_KEY`: `your-openai-api-key-here` (Get from https://platform.openai.com/api-keys)
 7. Click **Create Web Service**
 8. Copy the provided URL and update GitHub Actions secret `API_URL`
 
@@ -90,7 +102,7 @@ You have several options for deploying the Spring Boot backend:
 5. Deploy: `git subtree push --prefix backend heroku main`
 6. Set config: `heroku config:set CORS_ALLOWED_ORIGINS=https://YOUR_USERNAME.github.io`
 
-## Step 6: Configure GitHub Secrets
+## Step 7: Configure GitHub Secrets
 
 1. Go to your repository → **Settings** → **Secrets and variables** → **Actions**
 2. Click **New repository secret**
@@ -98,14 +110,14 @@ You have several options for deploying the Spring Boot backend:
    - **Name**: `API_URL`
    - **Value**: Your backend URL (e.g., `https://your-app.railway.app/api`)
 
-## Step 7: Update Frontend Environment
+## Step 8: Update Frontend Environment
 
 After deploying the backend, update the GitHub Actions workflow file `.github/workflows/deploy-frontend.yml`:
 
 1. Replace `https://your-backend-url.railway.app/api` with your actual backend URL
 2. Or ensure the `API_URL` secret is set correctly
 
-## Step 8: Trigger Deployment
+## Step 9: Trigger Deployment
 
 Push any change to trigger the deployment:
 
@@ -115,7 +127,7 @@ git commit -m "Configure deployment"
 git push
 ```
 
-## Step 9: Access Your Application
+## Step 10: Access Your Application
 
 After deployment completes:
 
@@ -136,8 +148,13 @@ After deployment completes:
 
 ### Backend not responding
 - Check Railway/Render logs
-- Verify environment variables are set
+- Verify environment variables are set (especially `OPENAI_API_KEY`)
 - Ensure port is configured correctly (Railway/Render auto-assigns PORT)
+
+### Natural language feature not working
+- Verify `OPENAI_API_KEY` environment variable is set in your deployment platform
+- Check backend logs for OpenAI API errors
+- Ensure you have credits in your OpenAI account
 
 ## Updating the Application
 

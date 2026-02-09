@@ -53,7 +53,7 @@ public class GptService {
         String prompt = buildPrompt(naturalLanguageText);
         
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "gpt-4o-mini");
+        requestBody.put("model", "gpt-5.2");
         requestBody.put("messages", new Object[]{
             Map.of("role", "system", "content", "You are a helpful assistant that extracts structured data from natural language. Always respond with valid JSON only."),
             Map.of("role", "user", "content", prompt)

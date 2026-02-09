@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -56,11 +57,35 @@ public class GptService {
                     .uri("/chat/completions")
                     .bodyValue(requestBody)
                     .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> response.bodyToMono(String.class)
+                                    .flatMap(body -> Mono.error(
+                                            new RuntimeException("OpenAI API error: " + response.statusCode() + " - " + body))))
                     .bodyToMono(String.class)
                     .block();
 
+            if (responseJson == null || responseJson.isBlank()) {
+                throw new RuntimeException("Empty response from OpenAI API");
+            }
+
             JsonNode response = objectMapper.readTree(responseJson);
+            
+            // Check for API errors in response
+            if (response.has("error")) {
+                JsonNode error = response.get("error");
+                String errorMessage = error.has("message") ? error.get("message").asText() : "Unknown OpenAI API error";
+                throw new RuntimeException("OpenAI API error: " + errorMessage);
+            }
+            
+            if (!response.has("choices") || response.get("choices").isEmpty()) {
+                throw new RuntimeException("Invalid response format from OpenAI API: no choices found");
+            }
+            
             String content = response.get("choices").get(0).get("message").get("content").asText();
+            
+            if (content == null || content.isBlank()) {
+                throw new RuntimeException("Empty content in OpenAI API response");
+            }
             
             JsonNode extracted = objectMapper.readTree(content);
             
@@ -93,8 +118,12 @@ public class GptService {
             }
 
             return new SampleExtractionResult(sampleCode, type, collectedAt, comment);
+        } catch (RuntimeException e) {
+            // Re-throw RuntimeException as-is (already has proper message)
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to extract sample information from natural language: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to extract sample information from natural language: " + e.getMessage() + 
+                    (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""), e);
         }
     }
 
